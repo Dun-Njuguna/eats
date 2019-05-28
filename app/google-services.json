@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "634547461565",
+    "firebase_url": "https://eats-bdfe9.firebaseio.com",
+    "project_id": "eats-bdfe9",
+    "storage_bucket": "eats-bdfe9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:634547461565:android:0b43fba37fd7fa33",
+        "android_client_info": {
+          "package_name": "com.dunk.eats"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "634547461565-ncj4jf97hv3toqp7oommrlejkbfik1qr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dunk.eats",
+            "certificate_hash": "0d2c209055ad2af3a27ef8e414756e8d7f4131ca"
+          }
+        },
+        {
+          "client_id": "634547461565-dcoe8qgucj1aa6n2qiqp5abcet2es7ah.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDngvNdE2Mr5gzEQiJYGHxo0EeNRzVt4EE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "634547461565-dcoe8qgucj1aa6n2qiqp5abcet2es7ah.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
