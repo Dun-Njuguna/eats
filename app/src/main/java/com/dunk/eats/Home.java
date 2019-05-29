@@ -1,5 +1,6 @@
 package com.dunk.eats;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +40,6 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Optional;
 
 public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -95,11 +96,13 @@ public class Home extends AppCompatActivity
         loadmenue();
     }
 
+
+
     private void loadmenue(){
 
         Query query = FirebaseDatabase.getInstance()
                 .getReference()
-                .child("Category");
+                .child("categories");
 
         FirebaseRecyclerOptions<Category> options =
                 new FirebaseRecyclerOptions.Builder<Category>()
@@ -108,8 +111,8 @@ public class Home extends AppCompatActivity
                             @Override
                             public Category parseSnapshot(@NonNull DataSnapshot snapshot) {
                                 return new Category(
-                                        snapshot.child("Image").getValue().toString(),
-                                        snapshot.child("Name").getValue().toString());
+                                        snapshot.child("image").getValue().toString(),
+                                        snapshot.child("name").getValue().toString());
 
                             }
                         }).build();
@@ -126,24 +129,29 @@ public class Home extends AppCompatActivity
 
 
             @Override
-            protected void onBindViewHolder(MenuViewHolder viewHolder, final int position, Category model) {
+                protected void onBindViewHolder(MenuViewHolder viewHolder, final int position, Category model) {
                 viewHolder.txtMenuName.setText(model.getImage());
                 Picasso.get().load(model.getName()).into(viewHolder.imageView);
-                final Category clickitem = model;
-                viewHolder.setOnClickListener(new ItemClickListener() {
+
+                viewHolder.setItemClickListener(new ItemClickListener(){
                     @Override
                     public void onclick(View view, int position, boolean isLongClick) {
-                        Toast.makeText(Home.this, "" + clickitem.getName(), Toast.LENGTH_SHORT).show();
+                        //get category id when user clicks and send to new activity
+                        Intent intent = new Intent(Home.this, FoodList.class);
+                        intent.putExtra("CategoryId", adapter.getRef(position).getKey());
+                        startActivity(intent);
                     }
                 });
             }
-
         };
+
+
 
         recycler_menu.setAdapter(adapter);
 
 
     }
+
 
     @Override
     public void onBackPressed() {

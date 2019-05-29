@@ -3,19 +3,16 @@ package com.dunk.eats.ViewHolder;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.dunk.eats.Home;
 import com.dunk.eats.Interface.ItemClickListener;
 import com.dunk.eats.R;
 
-public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class FoodViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    public TextView txtMenuName;
-    public ImageView imageView;
+    public TextView food_name;
+    public ImageView food_image;
 
     private ItemClickListener itemClickListener;
 
@@ -24,18 +21,18 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
 
     }
 
-    public MenuViewHolder(@NonNull View itemView) {
+    public FoodViewHolder(@NonNull View itemView) {
         super(itemView);
 
-        txtMenuName = (TextView)itemView.findViewById(R.id.menu_name);
-        imageView = (ImageView)itemView.findViewById(R.id.menu_image);
+        food_name = (TextView)itemView.findViewById(R.id.food_name);
+        food_image = (ImageView)itemView.findViewById(R.id.food_image);
 
         itemView.setOnClickListener(this);
     }
 
     @Override
-    public void onClick(View v) {
-        itemClickListener.onclick(v, getAdapterPosition(),false);
-    }
+    public void onClick(View view) {
+        itemClickListener.onclick(view, getAdapterPosition(),false);
 
+    }
 }
