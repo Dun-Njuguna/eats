@@ -1,5 +1,6 @@
 package com.dunk.eats;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +24,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        btnSignIn.setOnClickListener(this);
+        btnSignUp.setOnClickListener(this);
+
         Typeface typeface = Typeface.createFromAsset(getAssets(),"fonts/Nabila.ttf");
         textSlogan.setTypeface(typeface);
 
@@ -32,11 +36,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
 
         if (view == btnSignIn) {
-
+            Intent intent = new Intent(MainActivity.this, SignIn.class);
+                startActivity(intent);
         }
 
         if (view == btnSignUp) {
-
+            Intent intent = new Intent(MainActivity.this, SignUp.class);
+            startActivity(intent);
         }
 
     }
