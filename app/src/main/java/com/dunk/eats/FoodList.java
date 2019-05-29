@@ -1,5 +1,6 @@
 package com.dunk.eats;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -102,7 +103,8 @@ public class FoodList extends AppCompatActivity {
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onclick(View view, int position, boolean isLongClick) {
-                        Toast.makeText(FoodList.this, "Clicked", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(FoodList.this, FoodDetail.class);
+                        startActivity(intent);
                     }
                 });
             }

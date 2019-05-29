@@ -51,6 +51,9 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
 
+    //elegant number button
+    implementation 'com.cepheuen.elegant-number-button:lib:1.0.2'
+
 
 }
 
