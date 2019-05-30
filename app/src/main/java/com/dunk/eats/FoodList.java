@@ -99,12 +99,14 @@ public class FoodList extends AppCompatActivity {
             protected void onBindViewHolder(FoodViewHolder viewHolder, final int position, Food model) {
                 viewHolder.food_name.setText(model.getDescription());
                 Picasso.get().load(model.getDiscount()).into(viewHolder.food_image);
-                final Food clickitem = model;
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onclick(View view, int position, boolean isLongClick) {
+                        //start activity to navigate to food details page
                         Intent intent = new Intent(FoodList.this, FoodDetail.class);
+                        intent.putExtra("FoodId", adapter.getRef(position).getKey());
                         startActivity(intent);
+                        finish();
                     }
                 });
             }
