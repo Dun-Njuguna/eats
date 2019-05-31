@@ -7,7 +7,7 @@ public class Food {
     public Food() {
     }
 
-    public Food(String description, String discount) {
+    public Food(String description, String discount, String image, String menuId, String name, String price) {
         this.description = description;
         this.discount = discount;
         this.image = image;
@@ -15,6 +15,7 @@ public class Food {
         this.name = name;
         this.price = price;
     }
+
 
     public String getDescription() {
         return description;

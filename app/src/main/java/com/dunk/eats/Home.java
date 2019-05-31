@@ -140,7 +140,6 @@ public class Home extends AppCompatActivity
                         Intent intent = new Intent(Home.this, FoodList.class);
                         intent.putExtra("CategoryId", adapter.getRef(position).getKey());
                         startActivity(intent);
-                        finish();
                     }
                 });
             }

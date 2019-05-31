@@ -37,12 +37,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (view == btnSignIn) {
             Intent intent = new Intent(MainActivity.this, SignIn.class);
-                startActivity(intent);
+            startActivity(intent);
+            finish();
         }
 
         if (view == btnSignUp) {
             Intent intent = new Intent(MainActivity.this, SignUp.class);
             startActivity(intent);
+            finish();
         }
 
     }

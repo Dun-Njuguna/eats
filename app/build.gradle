@@ -59,6 +59,10 @@ dependencies {
 
     //sqliteassethelper
     implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+
+    //Material SearchBar Android
+     implementation 'com.github.mancj:MaterialSearchBar:0.7.1'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
