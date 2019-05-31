@@ -58,17 +58,17 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
             table_user.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-//                    if(dataSnapshot.child(edtPhone1.getText().toString()).exists()){
-//                        Toast.makeText(SignUp.this, "Phone Number already registered", Toast.LENGTH_SHORT).show();
-//
-//                    }else{
+                    if (dataSnapshot.child(edtPhone1.getText().toString()).exists()) {
+                        Toast.makeText(SignUp.this, "Phone Number already registered", Toast.LENGTH_SHORT).show();
+
+                    } else {
                         mDialog.dismiss();
-                        User newuser = new User(edtName1.getText().toString(),edtPassword1.getText().toString());
+                        User newuser = new User(edtName1.getText().toString(), edtPassword1.getText().toString());
                         table_user.child(edtPhone1.getText().toString()).setValue(newuser);
                         Toast.makeText(SignUp.this, "Sign Up successfully !", Toast.LENGTH_SHORT).show();
                         finish();
                     }
-
+                }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
