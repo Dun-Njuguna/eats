@@ -1,9 +1,10 @@
 package com.dunk.eats;
 
+
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -11,11 +12,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.dunk.eats.Interface.ItemClickListener;
 import com.dunk.eats.ViewHolder.FoodViewHolder;
-import com.dunk.eats.models.Category;
+import com.dunk.eats.ViewHolder.MenuViewHolder;
 import com.dunk.eats.models.Food;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -43,13 +43,16 @@ public class FoodList extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference foodlist;
     String categoryId = "";
+
     FirebaseRecyclerAdapter<Food, FoodViewHolder> adapter;
+    FirebaseRecyclerAdapter<Food, FoodViewHolder> firebaseRecyclerAdapter;
+
 
 
     //search functionality
-    FirebaseRecyclerAdapter<Food, FoodViewHolder> searchadapter;
     List<String> suggestList = new ArrayList<>();
-    @BindView(R.id.search_bar) MaterialSearchBar materialSearchBar;
+    @BindView(R.id.search_bar)
+    MaterialSearchBar materialSearchBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,11 +129,14 @@ public class FoodList extends AppCompatActivity {
 
     private void startSearch(CharSequence text) {
 
-        Query searchQueary = foodlist.orderByChild("name").equalTo(text.toString());
+        Query query = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("Foods").orderByChild("name").equalTo(text.toString());
+
 
         FirebaseRecyclerOptions<Food> options =
                 new FirebaseRecyclerOptions.Builder<Food>()
-                        .setQuery(searchQueary, new SnapshotParser<Food>() {
+                        .setQuery(query, new SnapshotParser<Food>() {
                             @NonNull
                             @Override
                             public Food parseSnapshot(@NonNull DataSnapshot snapshot) {
@@ -145,7 +151,7 @@ public class FoodList extends AppCompatActivity {
                         }).build();
 
 
-        searchadapter = new FirebaseRecyclerAdapter<Food, FoodViewHolder>(options) {
+       firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Food, FoodViewHolder>(options) {
             @Override
             public FoodViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(parent.getContext())
@@ -154,25 +160,56 @@ public class FoodList extends AppCompatActivity {
                 return new FoodViewHolder(view);
             }
 
+
             @Override
-            protected void onBindViewHolder(@NonNull FoodViewHolder holder, int position, @NonNull Food model) {
+            protected void onBindViewHolder(FoodViewHolder viewHolder, final int position, Food model) {
                 System.out.println(model.getName());
-                holder.food_name.setText(model.getName());
-                System.out.println(model.getName());
-                Picasso.get().load(model.getImage()).into(holder.food_image);
-                holder.setItemClickListener(new ItemClickListener() {
+                viewHolder.food_name.setText(model.getName());
+                Picasso.get().load(model.getImage()).into(viewHolder.food_image);
+                viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onclick(View view, int position, boolean isLongClick) {
-                        //start activity to navigate to food details page
+
                         Intent intent = new Intent(FoodList.this, FoodDetail.class);
-                        intent.putExtra("FoodId", searchadapter.getRef(position).getKey());
+                        intent.putExtra("FoodId", firebaseRecyclerAdapter.getRef(position).getKey());
                         startActivity(intent);
                     }
                 });
+            }
 
+        };
+        recycler_food.setAdapter(firebaseRecyclerAdapter);
+        firebaseRecyclerAdapter.startListening();
+
+/*
+
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference uidRef = rootRef.child("Foods");
+        uidRef.orderByChild("name").equalTo(text);
+
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Food post = ds.getValue(Food.class);
+                    if (post.getName().equals(text)) {
+                        System.out.println(post.getName());
+                        System.out.println(post.getImage());
+
+
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                return ;
             }
         };
-        recycler_food.setAdapter(searchadapter);
+        uidRef.addListenerForSingleValueEvent(valueEventListener);
+ */
+
     }
 
     //load suggestions from firebase
@@ -193,9 +230,6 @@ public class FoodList extends AppCompatActivity {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
-        System.out.println(suggestList);
-
-
     }
 
 
@@ -237,7 +271,6 @@ public class FoodList extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(FoodViewHolder viewHolder, final int position, Food model) {
                 viewHolder.food_name.setText(model.getName());
-                System.out.println(model.getName());
                 Picasso.get().load(model.getImage()).into(viewHolder.food_image);
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
@@ -259,12 +292,14 @@ public class FoodList extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         adapter.startListening();
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        adapter.stopListening();
+        firebaseRecyclerAdapter.stopListening();
     }
+
 }
 
