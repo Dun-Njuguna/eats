@@ -59,8 +59,10 @@ public class OrderStatus extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         phone = Common.currentUser.getPhone();
-
-        loadOrders(phone);
+        if (getIntent() == null)
+            loadOrders(phone);
+        else
+            loadOrders(getIntent().getStringExtra("userPhone"));
     }
 
     private void loadOrders(final String phone) {

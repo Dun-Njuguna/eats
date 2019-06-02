@@ -83,13 +83,13 @@ public class ListenOrder extends Service implements ChildEventListener {
         String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Order status notification", NotificationManager.IMPORTANCE_HIGH);
 
-            // Configure the notification channel.
-            notificationChannel.setDescription("Channel description");
+
+            notificationChannel.setDescription("Order status notification");
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
-            notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
             notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
         }
@@ -99,7 +99,7 @@ public class ListenOrder extends Service implements ChildEventListener {
 
         notificationBuilder.setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
-                .setWhen(System.currentTimeMillis())
+                .setWhen(1000)
                 .setTicker("dunk")
                 .setContentInfo("Your order was updated")
                 .setContentText("Order #" + key + "status was updated to " + Common.convertCodeToStatus(request.getStatus()))

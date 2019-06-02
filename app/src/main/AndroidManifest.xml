@@ -3,6 +3,8 @@
     package="com.dunk.eats">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
 
     <application
         android:allowBackup="true"
@@ -14,7 +16,22 @@
         <service
             android:name=".Service.ListenOrder"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.dunk.eats.Service.ListenOrder" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".Service.BootReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:label="BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
 
         <activity android:name=".OrderStatus" />
         <activity android:name=".Cart" />
