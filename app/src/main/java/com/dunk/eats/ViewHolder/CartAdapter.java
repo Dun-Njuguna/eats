@@ -25,14 +25,22 @@ class CartViewHolder extends RecyclerView.ViewHolder implements View.OnClickList
     public TextView txt_cart_name,text_price;
     public ImageView img_cart_count;
 
-    private ItemClickListener itemClickListener;
+    ItemClickListener itemClickListener;
+
+    public TextView getTxt_cart_name() {
+        return txt_cart_name;
+    }
 
     public void setTxt_cart_name(TextView txt_cart_name) {
         this.txt_cart_name = txt_cart_name;
     }
 
-    public void setImg_cart_count(ImageView img_cart_count) {
-        this.img_cart_count = img_cart_count;
+    public TextView getText_price() {
+        return text_price;
+    }
+
+    public void setText_price(TextView text_price) {
+        this.text_price = text_price;
     }
 
     public CartViewHolder(@NonNull View itemView) {
@@ -45,13 +53,15 @@ class CartViewHolder extends RecyclerView.ViewHolder implements View.OnClickList
 
     @Override
     public void onClick(View v) {
+        itemClickListener.onclick(v, getAdapterPosition(),false);
 
     }
 }
 
+
 public class CartAdapter extends RecyclerView.Adapter<CartViewHolder>{
 
-    private List<Order>  listData = new ArrayList<>();
+    private List<Order>  listData ;
     private Context context;
 
     public CartAdapter(List<Order> listData, Context context) {

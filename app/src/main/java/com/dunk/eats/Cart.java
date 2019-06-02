@@ -87,11 +87,13 @@ public class Cart extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //Create new request
+
                 Request request = new Request(
                         Common.currentUser.getPhone(),
                         Common.currentUser.getName(),
                         editAddress.getText().toString(),
                         textTotalPrice.getText().toString(),
+                            "1",
                         carts
                 );
 

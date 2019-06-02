@@ -180,37 +180,10 @@ public class FoodList extends AppCompatActivity {
         };
         recycler_food.setAdapter(firebaseRecyclerAdapter);
         firebaseRecyclerAdapter.startListening();
-
-/*
-
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference uidRef = rootRef.child("Foods");
-        uidRef.orderByChild("name").equalTo(text);
-
-        ValueEventListener valueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                    Food post = ds.getValue(Food.class);
-                    if (post.getName().equals(text)) {
-                        System.out.println(post.getName());
-                        System.out.println(post.getImage());
-
-
-                    }
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                return ;
-            }
-        };
-        uidRef.addListenerForSingleValueEvent(valueEventListener);
- */
-
     }
+
+
+
 
     //load suggestions from firebase
     private void loadSuggestions() {
@@ -287,7 +260,6 @@ public class FoodList extends AppCompatActivity {
         recycler_food.setAdapter(adapter);
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -298,7 +270,6 @@ public class FoodList extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        firebaseRecyclerAdapter.stopListening();
     }
 
 }

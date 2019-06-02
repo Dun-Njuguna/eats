@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.dunk.eats.Common.Common;
 import com.dunk.eats.Interface.ItemClickListener;
 import com.dunk.eats.ViewHolder.OrderViewHolder;
+import com.dunk.eats.models.Order;
 import com.dunk.eats.models.Request;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -24,6 +25,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,17 +73,25 @@ public class OrderStatus extends AppCompatActivity {
                         .setQuery(query, new SnapshotParser<Request>() {
                             @NonNull
                             @Override
-                            public Request parseSnapshot(@NonNull DataSnapshot snapshot){
-                                return new Request(
-                                    snapshot.child("address").getValue().toString(),
-                                    snapshot.child("phone").getValue().toString());
+                            public Request parseSnapshot(@NonNull DataSnapshot snapshot) {
+                                List<Order> tfoods = (ArrayList<Order>) snapshot.child("foods").getValue();
+                                System.out.println(tfoods);
+
+
+                                String address = snapshot.child("address").getValue().toString();
+                                String name = snapshot.child("name").getValue().toString();
+                                String phone =  snapshot.child("phone").getValue().toString();
+                                String status =  snapshot.child("status").getValue().toString();
+                                String total =  snapshot.child("total").getValue().toString();
+
+
+                                return new Request(phone, name, address, total, status, tfoods);
                             }
+
                         }).build();
 
 
-
         adapter = new FirebaseRecyclerAdapter<Request, OrderViewHolder>(options) {
-
             @Override
             public OrderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View view = LayoutInflater.from(parent.getContext())
@@ -90,33 +102,31 @@ public class OrderStatus extends AppCompatActivity {
 
 
             @Override
-            protected void onBindViewHolder(OrderViewHolder viewHolder, final int position, Request request) {
+            protected void onBindViewHolder(OrderViewHolder viewHolder, final int position, Request model) {
                 viewHolder.txtOrderId.setText("Order Id: " +"#" + adapter.getRef(position).getKey());
-                viewHolder.txtOrderStatus.setText("Status: " + convertCodeToStatus(request.getStatus()));
-                viewHolder.txtOrderPhone.setText("Phone: " + request.getPhone());
-                viewHolder.txtOrderAddress.setText("Address: " + request.getAddress());
+                viewHolder.txtOrderStatus.setText("Status: " + Common.convertCodeToStatus(model.getStatus()));
+                System.out.println(model.getTotal());
+                viewHolder.txtOrderPhone.setText("Phone: " + model.getPhone());
+                viewHolder.txtOrderAddress.setText("Address: " + model.getAddress());
 
+                System.out.println(model.getStatus());
+                System.out.println(model.getTotal());
+                System.out.println(model.getName());
+                System.out.println(model.getAddress());
+                System.out.println(model.getFoods());
 
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onclick(View view, int position, boolean isLongClick) {
-//                        Toast.makeText(OrderStatus.this, "clicked", Toast.LENGTH_SHORT).show();
+
                     }
                 });
             }
-
         };
+        adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
     }
 
-    private String convertCodeToStatus(String status) {
-        if (status != null && status.equals("0"))
-            return "Placed";
-        else if (status != null && status.equals("1"))
-            return "On my way";
-        else
-            return "Shipped";
-    }
 
 
 

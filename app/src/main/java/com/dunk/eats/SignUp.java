@@ -1,6 +1,7 @@
 package com.dunk.eats;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 
+import com.dunk.eats.Common.Common;
 import com.dunk.eats.models.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,6 +32,8 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
     @BindView(R.id.edtPassword1) MaterialEditText edtPassword1;
 
     @BindView(R.id.btnSignUp1) Button btnSignUp;
+
+    String current1;
 
     private DatabaseReference table_user;
 
@@ -66,7 +70,8 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
                         User newuser = new User(edtName1.getText().toString(), edtPassword1.getText().toString());
                         table_user.child(edtPhone1.getText().toString()).setValue(newuser);
                         Toast.makeText(SignUp.this, "Sign Up successfully !", Toast.LENGTH_SHORT).show();
-                        finish();
+                        Intent intent = new Intent(SignUp.this,SignIn.class);
+                        startActivity(intent);
                     }
                 }
 
