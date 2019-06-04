@@ -53,34 +53,42 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
     @Override
     public void onClick(View view) {
 
-        if (view == btnSignUp) {
+        if (Common.isConnectedInternet(this)) {
 
-            final ProgressDialog mDialog = new ProgressDialog(SignUp.this);
-            mDialog.setMessage("Signing Up....");
-            mDialog.show();
 
-            table_user.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.child(edtPhone1.getText().toString()).exists()) {
-                        Toast.makeText(SignUp.this, "Phone Number already registered", Toast.LENGTH_SHORT).show();
+            if (view == btnSignUp) {
 
-                    } else {
-                        mDialog.dismiss();
-                        User newuser = new User(edtName1.getText().toString(), edtPassword1.getText().toString());
-                        table_user.child(edtPhone1.getText().toString()).setValue(newuser);
-                        Toast.makeText(SignUp.this, "Sign Up successfully !", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(SignUp.this,SignIn.class);
-                        startActivity(intent);
+                final ProgressDialog mDialog = new ProgressDialog(SignUp.this);
+                mDialog.setMessage("Signing Up....");
+                mDialog.show();
+
+                table_user.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.child(edtPhone1.getText().toString()).exists()) {
+                            Toast.makeText(SignUp.this, "Phone Number already registered", Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            mDialog.dismiss();
+                            User newuser = new User(edtName1.getText().toString(), edtPassword1.getText().toString());
+                            table_user.child(edtPhone1.getText().toString()).setValue(newuser);
+                            Toast.makeText(SignUp.this, "Sign Up successfully !", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(SignUp.this, SignIn.class);
+                            startActivity(intent);
+                        }
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                }
-            });
+                    }
+                });
 
+            }
+        }
+        else{
+            Toast.makeText(this, "Please Check your internet connection", Toast.LENGTH_SHORT).show();
+            return;
         }
 
     }

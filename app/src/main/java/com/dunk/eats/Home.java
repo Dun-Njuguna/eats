@@ -30,6 +30,7 @@ import com.dunk.eats.Interface.ItemClickListener;
 import com.dunk.eats.Service.ListenOrder;
 import com.dunk.eats.ViewHolder.MenuViewHolder;
 import com.dunk.eats.models.Category;
+import com.dunk.eats.models.Request;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
@@ -196,6 +197,7 @@ public class Home extends AppCompatActivity
         } else if (id == R.id.nav_order) {
 
             Intent intent = new Intent(this,OrderStatus.class);
+            intent.putExtra("userPhone", "");
             startActivity(intent);
 
         } else if (id == R.id.nav_log_out) {

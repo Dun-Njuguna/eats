@@ -1,5 +1,10 @@
 package com.dunk.eats.Common;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+
 import com.dunk.eats.models.User;
 
 public class Common {
@@ -13,5 +18,20 @@ public class Common {
             return "On my way";
         else
             return "Shipped";
+    }
+
+    public static boolean isConnectedInternet(Context context){
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        Network[] networks=connectivityManager.getAllNetworks();
+        if (connectivityManager != null) {
+            for (Network netinfo : networks) {
+                NetworkInfo ni = connectivityManager.getNetworkInfo(netinfo);
+                if (ni.isConnected() && ni.isAvailable()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

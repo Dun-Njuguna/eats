@@ -60,9 +60,10 @@ public class OrderStatus extends AppCompatActivity {
 
         phone = Common.currentUser.getPhone();
         if (getIntent() == null)
-            loadOrders(phone);
-        else
             loadOrders(getIntent().getStringExtra("userPhone"));
+        else
+            loadOrders(phone);
+        System.out.println(getIntent().getStringExtra("userPhone"));
     }
 
     private void loadOrders(final String phone) {
@@ -85,6 +86,7 @@ public class OrderStatus extends AppCompatActivity {
                                 String phone =  snapshot.child("phone").getValue().toString();
                                 String status =  snapshot.child("status").getValue().toString();
                                 String total =  snapshot.child("total").getValue().toString();
+                                System.out.println(total);
 
 
                                 return new Request(phone, name, address, total, status, tfoods);
