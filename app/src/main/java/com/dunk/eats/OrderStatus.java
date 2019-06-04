@@ -59,7 +59,7 @@ public class OrderStatus extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
 
-        if (Common.isConnectedInternet(this) == true){
+        if (Common.isConnectedInternet(this)){
             phone = Common.currentUser.getPhone();
             if (getIntent() == null)
                 loadOrders(getIntent().getStringExtra("userPhone"));
@@ -144,12 +144,14 @@ public class OrderStatus extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        adapter.startListening();
+        if (adapter != null)
+            adapter.startListening();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        adapter.stopListening();
+        if (adapter != null)
+            adapter.stopListening();
     }
 }

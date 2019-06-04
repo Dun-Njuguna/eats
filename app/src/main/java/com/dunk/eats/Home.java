@@ -95,13 +95,12 @@ public class Home extends AppCompatActivity
         layoutManager = new LinearLayoutManager(this);
         recycler_menu.setLayoutManager(layoutManager);
 
-        loadmenue();
-
         //Register service
         Intent service = new Intent(Home.this, ListenOrder.class);
         startService(service);
 
-        //check internet connection
+
+        //check internet connection then load menue
         if (Common.isConnectedInternet(this) == true){
             loadmenue();
         }
@@ -111,7 +110,6 @@ public class Home extends AppCompatActivity
         }
 
     }
-
 
 
     private void loadmenue(){
@@ -160,12 +158,7 @@ public class Home extends AppCompatActivity
                 });
             }
         };
-
-
-
         recycler_menu.setAdapter(adapter);
-
-
     }
 
 
@@ -188,6 +181,17 @@ public class Home extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.refresh){
+            if (Common.isConnectedInternet(this)){
+                adapter.onDetachedFromRecyclerView(recycler_menu);
+                adapter.startListening();
+                adapter.notifyDataSetChanged();
+            }
+            else
+                Toast.makeText(this, "Check internet connection", Toast.LENGTH_SHORT).show();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -221,13 +225,15 @@ public class Home extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        adapter.startListening();
+        if (Common.isConnectedInternet(this))
+             adapter.startListening();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        adapter.stopListening();
+        if (Common.isConnectedInternet(this))
+             adapter.stopListening();
     }
 
 }

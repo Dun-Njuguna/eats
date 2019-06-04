@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -59,7 +60,10 @@ public class Cart extends AppCompatActivity {
         btnPlace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAlertDialog();
+                if (carts.size() > 0)
+                    showAlertDialog();
+                else
+                    Toast.makeText(Cart.this, "Your cart is empty", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -93,7 +97,7 @@ public class Cart extends AppCompatActivity {
                         Common.currentUser.getName(),
                         editAddress.getText().toString(),
                         textTotalPrice.getText().toString(),
-                            "1",
+                            "0",
                         carts
                 );
 
@@ -123,19 +127,42 @@ public class Cart extends AppCompatActivity {
     }
     private void loadListFood() {
 
-    carts = new Database(this).getCarts();
-    adapter = new CartAdapter(carts,this);
-    recyclerView.setAdapter(adapter);
+        carts = new Database(this).getCarts();
+        adapter = new CartAdapter(carts,this);
+        adapter.notifyDataSetChanged();
+        recyclerView.setAdapter(adapter);
 
-    int total = 0;
-    for (Order order:carts){
-        total+=(Integer.parseInt(order.getPrice())*(Integer.parseInt(order.getQuantity())));
+        int total = 0;
+        for (Order order:carts){
+            total+=(Integer.parseInt(order.getPrice())*(Integer.parseInt(order.getQuantity())));
 
-        Locale locale = new Locale("en","US");
-        NumberFormat fnt = NumberFormat.getCurrencyInstance(locale);
+            Locale locale = new Locale("en","US");
+            NumberFormat fnt = NumberFormat.getCurrencyInstance(locale);
 
-        textTotalPrice.setText(fnt.format(total));
+            textTotalPrice.setText(fnt.format(total));
+
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        if (item.getTitle().equals(Common.DELETE))
+            deleteCart(item.getOrder());
+        return true;
+    }
+
+    private void deleteCart(int order) {
+        // remove item from list<order> by position where position is refrenced by order
+        carts.remove(order);
+        //then delete old data from firebase
+        new Database(this).cleanCart();
+        //then update database with details from list<order>
+        for (Order item: carts)
+            new Database(this).addToCart(item);
+        //refresh ui
+        loadListFood();
 
     }
-    }
+
 }

@@ -9,7 +9,7 @@ import com.dunk.eats.models.User;
 
 public class Common {
     public static User currentUser;
-
+    public static final String DELETE = "Delete";
 
     public static String convertCodeToStatus(String status) {
         if (status != null && status.equals("0"))
