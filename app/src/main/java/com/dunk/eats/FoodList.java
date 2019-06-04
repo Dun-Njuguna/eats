@@ -12,8 +12,11 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.dunk.eats.Common.Common;
 import com.dunk.eats.Interface.ItemClickListener;
+import com.dunk.eats.Service.ListenOrder;
 import com.dunk.eats.ViewHolder.FoodViewHolder;
 import com.dunk.eats.ViewHolder.MenuViewHolder;
 import com.dunk.eats.models.Food;
@@ -69,6 +72,10 @@ public class FoodList extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recycler_food.setLayoutManager(layoutManager);
 
+        //register service
+        Intent intent = new Intent(this, ListenOrder.class);
+        startService(intent);
+
         //recieving intent with category id
         if (getIntent() != null) {
             categoryId = getIntent().getStringExtra("CategoryId");
@@ -76,6 +83,16 @@ public class FoodList extends AppCompatActivity {
 
         if (!categoryId.isEmpty() && categoryId != null) {
             loodLFoodList(categoryId);
+        }
+
+        //check internet connection
+        if (Common.isConnectedInternet(this) == true){
+            loadSuggestions();
+            loodLFoodList(categoryId);
+        }
+        else{
+            Toast.makeText(this, "Check Internet connection", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         //search

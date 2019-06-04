@@ -87,7 +87,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener{
             }
         }
         else{
-            Toast.makeText(this, "Please Check your internet connection", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Check Internet connection", Toast.LENGTH_SHORT).show();
             return;
         }
 

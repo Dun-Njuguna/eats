@@ -101,6 +101,15 @@ public class Home extends AppCompatActivity
         Intent service = new Intent(Home.this, ListenOrder.class);
         startService(service);
 
+        //check internet connection
+        if (Common.isConnectedInternet(this) == true){
+            loadmenue();
+        }
+        else{
+            Toast.makeText(this, "Check Internet connection", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
     }
 
 

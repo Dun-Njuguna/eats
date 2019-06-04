@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
+import com.dunk.eats.Common.Common;
 import com.dunk.eats.Database.Database;
 import com.dunk.eats.models.Food;
 import com.dunk.eats.models.Order;
@@ -83,6 +84,16 @@ public class FoodDetail extends AppCompatActivity {
                 Toast.makeText(FoodDetail.this, "Added to Cart", Toast.LENGTH_SHORT).show();
             }
         });
+
+
+        if (Common.isConnectedInternet(this) == true){
+            getFoodDetails(foodId);
+        }
+        else{
+            Toast.makeText(this, "Check Internet connection", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
     }
 
     private void getFoodDetails(String foodId) {

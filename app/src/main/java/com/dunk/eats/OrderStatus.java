@@ -58,12 +58,18 @@ public class OrderStatus extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        phone = Common.currentUser.getPhone();
-        if (getIntent() == null)
-            loadOrders(getIntent().getStringExtra("userPhone"));
-        else
-            loadOrders(phone);
-        System.out.println(getIntent().getStringExtra("userPhone"));
+
+        if (Common.isConnectedInternet(this) == true){
+            phone = Common.currentUser.getPhone();
+            if (getIntent() == null)
+                loadOrders(getIntent().getStringExtra("userPhone"));
+            else
+                loadOrders(phone);
+        }
+        else{
+            Toast.makeText(this, "Check Internet connection", Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 
     private void loadOrders(final String phone) {
