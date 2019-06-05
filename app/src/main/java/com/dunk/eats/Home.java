@@ -42,6 +42,7 @@ import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.paperdb.Paper;
 
 public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -108,6 +109,9 @@ public class Home extends AppCompatActivity
             Toast.makeText(this, "Check Internet connection", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        //init paper
+        Paper.init(this);
 
     }
 
@@ -215,6 +219,12 @@ public class Home extends AppCompatActivity
 
         } else if (id == R.id.nav_log_out) {
 
+            //Delete key-value pairs for login
+            Paper.book().destroy();
+
+            Intent sigOut = new Intent(this,SignIn.class);
+            sigOut.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(sigOut);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

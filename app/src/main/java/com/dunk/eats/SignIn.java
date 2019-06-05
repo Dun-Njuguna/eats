@@ -17,15 +17,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.rey.material.widget.CheckBox;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.paperdb.Paper;
 
 public class SignIn extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.edtPhone) MaterialEditText edtPhone;
     @BindView(R.id.edtPassword) MaterialEditText edtPassword;
     @BindView(R.id.btnSignin) Button btnSignIn;
+    @BindView(R.id.chkRemember) CheckBox chkRemember;
 
     private DatabaseReference table_user;
 
@@ -36,6 +39,9 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener {
         ButterKnife.bind(this);
 
         btnSignIn.setOnClickListener(this);
+
+        //init paper
+        Paper.init(this);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         table_user = database.getReference("User");
@@ -48,6 +54,15 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener {
         if (view == btnSignIn) {
 
             if (Common.isConnectedInternet(this)) {
+
+                //save user and password to memmory
+                if (chkRemember.isChecked()){
+                    Paper.book().write(Common.USER_KEY,edtPhone.getText().toString());
+                    Paper.book().write(Common.PSD_KEY,edtPassword.getText().toString());
+
+                }
+
+
 
                 final ProgressDialog mDialog = new ProgressDialog(SignIn.this);
 

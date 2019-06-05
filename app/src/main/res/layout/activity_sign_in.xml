@@ -49,6 +49,18 @@
             app:met_singleLineEllipsis="true"
             />
 
+        <com.rey.material.widget.CheckBox
+            android:id="@+id/chkRemember"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Material.Drawable.CheckBox"
+            android:text="Remember me"
+            android:gravity="center_vertical"
+            android:textColor="@android:color/white"
+            app:cbd_strokeColor= "@android:color/white"
+            app:cbd_tickColor="@color/colorPrimaryDark"
+            />
+
     </android.support.v7.widget.LinearLayoutCompat>
 
     <info.hoang8f.widget.FButton
@@ -63,5 +75,7 @@
         android:backgroundTint="@color/buttonSignActive"
         android:text="Sign In"
         android:textColor="@android:color/white" />
+
+
 
 </RelativeLayout>

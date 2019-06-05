@@ -63,6 +63,13 @@ dependencies {
     //Material SearchBar Android
      implementation 'com.github.mancj:MaterialSearchBar:0.7.1'
 
+    //Paper
+    implementation 'io.paperdb:paperdb:2.6'
+
+    //Material
+    implementation 'com.github.rey5137:material:1.2.5'
+
+
 }
 
 apply plugin: 'com.google.gms.google-services'
