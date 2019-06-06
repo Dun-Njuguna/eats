@@ -66,8 +66,11 @@ dependencies {
     //Paper
     implementation 'io.paperdb:paperdb:2.6'
 
-    //Material
+    //Material checkbox
     implementation 'com.github.rey5137:material:1.2.5'
+
+    //Material ratingbar
+    implementation 'com.stepstone.apprating:app-rating:2.0.0'
 
 
 }
