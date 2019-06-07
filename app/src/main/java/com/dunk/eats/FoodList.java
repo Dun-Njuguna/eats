@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.dunk.eats.Common.Common;
 import com.dunk.eats.Database.Database;
 import com.dunk.eats.Interface.ItemClickListener;
-import com.dunk.eats.Service.ListenOrder;
 import com.dunk.eats.ViewHolder.FoodViewHolder;
 import com.dunk.eats.ViewHolder.MenuViewHolder;
 import com.dunk.eats.models.Food;
@@ -78,9 +77,6 @@ public class FoodList extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recycler_food.setLayoutManager(layoutManager);
 
-        //register service
-        Intent intent = new Intent(this, ListenOrder.class);
-        startService(intent);
 
         //recieving intent with category id
         if (getIntent() != null) {

@@ -16,6 +16,7 @@ public class User {
         IsStaff= "false";
     }
 
+
     public String getIsStaff() {
         return IsStaff;
     }

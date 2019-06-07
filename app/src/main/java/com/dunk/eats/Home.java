@@ -3,11 +3,10 @@ package com.dunk.eats;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
@@ -20,24 +19,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dunk.eats.Common.Common;
 import com.dunk.eats.Interface.ItemClickListener;
-import com.dunk.eats.Service.ListenOrder;
+import com.dunk.eats.Service.MyFirebaseIdService;
 import com.dunk.eats.ViewHolder.MenuViewHolder;
 import com.dunk.eats.models.Category;
-import com.dunk.eats.models.Request;
+import com.dunk.eats.models.Token;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -55,6 +56,7 @@ public class Home extends AppCompatActivity
 
     FirebaseRecyclerAdapter<Category,MenuViewHolder> adapter;
 
+    String currentUserPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +98,6 @@ public class Home extends AppCompatActivity
         layoutManager = new LinearLayoutManager(this);
         recycler_menu.setLayoutManager(layoutManager);
 
-        //Register service
-        Intent service = new Intent(Home.this, ListenOrder.class);
-        startService(service);
 
 
         //check internet connection then load menue
@@ -113,6 +112,31 @@ public class Home extends AppCompatActivity
         //init paper
         Paper.init(this);
 
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        System.out.println(token);
+                        updateToken(token);
+                    }
+                });
+
+
+    }
+    //add token during login
+    private void updateToken(String instanceId) {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference tokens = db.getReference("Tokens");
+        Token token1 = new Token(instanceId, false); //false token is sent from client app
+        currentUserPhone = Common.currentUser.getPhone();
+        tokens.child(currentUserPhone).setValue(token1);
     }
 
 

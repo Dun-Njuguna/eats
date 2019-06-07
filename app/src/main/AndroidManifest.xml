@@ -13,25 +13,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <service
-            android:name=".Service.ListenOrder"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.dunk.eats.Service.ListenOrder" />
-            </intent-filter>
-        </service>
-
-        <receiver
-            android:name=".Service.BootReceiver"
-            android:enabled="true"
-            android:exported="true"
-            android:label="BootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
 
         <activity android:name=".OrderStatus" />
         <activity android:name=".Cart" />
@@ -50,6 +31,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <service
+            android:name=".Service.MyFirebaseIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

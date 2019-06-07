@@ -1,11 +1,14 @@
 package com.dunk.eats;
 
+
 import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -15,11 +18,20 @@ import android.widget.Toast;
 
 import com.dunk.eats.Common.Common;
 import com.dunk.eats.Database.Database;
+import com.dunk.eats.Remote.APIService;
 import com.dunk.eats.ViewHolder.CartAdapter;
+import com.dunk.eats.models.MyResponse;
+import com.dunk.eats.models.Notification;
 import com.dunk.eats.models.Order;
 import com.dunk.eats.models.Request;
+import com.dunk.eats.models.Sender;
+import com.dunk.eats.models.Token;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -29,12 +41,18 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.hoang8f.widget.FButton;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Cart extends AppCompatActivity {
 
-    @BindView(R.id.listCart) RecyclerView recyclerView;
-    @BindView(R.id.total) TextView textTotalPrice;
-    @BindView(R.id.btnPlaceOrder) FButton btnPlace;
+    @BindView(R.id.listCart)
+    RecyclerView recyclerView;
+    @BindView(R.id.total)
+    TextView textTotalPrice;
+    @BindView(R.id.btnPlaceOrder)
+    FButton btnPlace;
     
     RecyclerView.LayoutManager layoutManager;
     FirebaseDatabase database;
@@ -42,6 +60,8 @@ public class Cart extends AppCompatActivity {
 
     List<Order> carts = new ArrayList<>();
     CartAdapter adapter;
+
+    APIService mService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +72,9 @@ public class Cart extends AppCompatActivity {
         //firebase
         database = FirebaseDatabase.getInstance();
         requests = database.getReference("Requests");
+
+        //init service
+        mService = Common.getFCMService();
 
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -104,13 +127,15 @@ public class Cart extends AppCompatActivity {
                 //Submit request to firebase
                 //using System.CurrentMilli to key
 
-                requests.child(String.valueOf(System.currentTimeMillis()))
-                        .setValue(request);
+                String order_number = String.valueOf(System.currentTimeMillis());
+                requests.child(order_number).setValue(request);
+
+                sendNotificationOrder(order_number);
+
                 //Delete cart
                 new Database(getBaseContext()).cleanCart();
-
-                Toast.makeText(Cart.this, "Order Placed", Toast.LENGTH_SHORT).show();
-                finish();
+                //refresh ui
+                loadListFood();
 
             }
         });
@@ -125,6 +150,55 @@ public class Cart extends AppCompatActivity {
         alertDialog.show();
 
     }
+
+    private void sendNotificationOrder(final String order_number) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        // get all node with isServerToken is true
+        Query data = tokens.orderByChild("serverToken").equalTo(true);
+        data.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()){
+                    Token token = postSnapshot.getValue(Token.class);
+                    System.out.println(token);
+
+                    //create raw payload to send
+                    Notification notification = new Notification ("Eats","New order" + order_number);
+                    Sender content = new Sender(token.getToken(),notification);
+
+                    mService.sendNotification(content)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200){
+                                        if (response.body().success == 1)
+                                        {
+                                            Toast.makeText(Cart.this, "Order " + order_number + " placed", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                        }
+                                        else
+                                        {
+                                            Toast.makeText(Cart.this, "Order updated but failed to send notification", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+                                    Log.e("ERROR", t.getMessage());
+                                }
+                            });
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void loadListFood() {
 
         carts = new Database(this).getCarts();

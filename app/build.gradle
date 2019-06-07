@@ -31,7 +31,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.9'
     implementation 'com.google.firebase:firebase-database:17.0.0'
     implementation 'com.firebaseui:firebase-ui-database:5.0.0'
-
+    implementation 'com.google.firebase:firebase-messaging:18.0.0'
 
     //button
     implementation 'info.hoang8f:fbutton:1.0.5'
@@ -71,6 +71,11 @@ dependencies {
 
     //Material ratingbar
     implementation 'com.stepstone.apprating:app-rating:2.0.0'
+
+    //retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
+
 
 
 }

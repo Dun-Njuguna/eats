@@ -81,6 +81,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener {
                             if (user.getPassword().equals(edtPassword.getText().toString())) {
                                 {
                                     Intent homeIntent = new Intent(SignIn.this, Home.class);
+                                    homeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     Common.currentUser = user;
                                     startActivity(homeIntent);
                                     finish();

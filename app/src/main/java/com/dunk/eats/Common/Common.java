@@ -5,6 +5,8 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 
+import com.dunk.eats.Remote.APIService;
+import com.dunk.eats.Remote.RetrofitClient;
 import com.dunk.eats.models.User;
 
 public class Common {
@@ -12,6 +14,13 @@ public class Common {
     public static final String DELETE = "Delete";
     public static final String USER_KEY = "User";
     public static final String PSD_KEY = "Password";
+    public static final String BASE_URL = "https://fcm.googleapis.com/";
+    public  static String token;
+
+
+    public static APIService getFCMService(){
+        return RetrofitClient.getClient(BASE_URL).create(APIService.class);
+    }
 
     public static String convertCodeToStatus(String status) {
         if (status != null && status.equals("0"))
