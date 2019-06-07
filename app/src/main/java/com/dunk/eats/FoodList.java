@@ -2,6 +2,8 @@ package com.dunk.eats;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +22,10 @@ import com.dunk.eats.Interface.ItemClickListener;
 import com.dunk.eats.ViewHolder.FoodViewHolder;
 import com.dunk.eats.ViewHolder.MenuViewHolder;
 import com.dunk.eats.models.Food;
+import com.facebook.CallbackManager;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareDialog;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
@@ -31,6 +37,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +64,42 @@ public class FoodList extends AppCompatActivity {
     @BindView(R.id.search_bar)
     MaterialSearchBar materialSearchBar;
 
+    //favourites localdb
     Database localdb;
+
+    //facebook share
+    CallbackManager callbackManager;
+    ShareDialog shareDialog;
+
+    //Create target from picasso
+    Target target = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            //Create photo from Bitmap
+            SharePhoto photo = new SharePhoto.Builder()
+                    .setBitmap(bitmap)
+                    .build();
+
+            if (ShareDialog.canShow(SharePhotoContent.class)){
+
+                SharePhotoContent content = new SharePhotoContent.Builder()
+                        .addPhoto(photo)
+                        .build();
+                shareDialog.show(content);
+            }
+
+        }
+
+        @Override
+        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +113,11 @@ public class FoodList extends AppCompatActivity {
 
         //local database
         localdb = new Database(this);
+
+        //init facebook
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog(this);
+
 
         //loadfoodlist
         recycler_food.setHasFixedSize(true);
@@ -268,6 +315,18 @@ public class FoodList extends AppCompatActivity {
                 //Add favourites
                 if (localdb.isFavourites(adapter.getRef(position).getKey()))
                     viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_black_24dp);
+
+                //click to share
+                viewHolder.btnShare.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Picasso.get()
+                                .load(model.getImage())
+                                .into(target);
+
+                    }
+                });
+
 
                 //click to change status of favourites
                 viewHolder.fav_image.setOnClickListener(new View.OnClickListener() {
