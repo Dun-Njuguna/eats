@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -71,6 +72,9 @@ public class FoodList extends AppCompatActivity {
     CallbackManager callbackManager;
     ShareDialog shareDialog;
 
+    @BindView(R.id.foodlist_refresh) SwipeRefreshLayout swipeRefreshLayout;
+
+
     //Create target from picasso
     Target target = new Target() {
         @Override
@@ -124,6 +128,43 @@ public class FoodList extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recycler_food.setLayoutManager(layoutManager);
 
+        //swipe refresh layout
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark
+        );
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //check internet connection
+                if (Common.isConnectedInternet(getBaseContext()) == true){
+                    loadSuggestions();
+                    loodLFoodList(categoryId);
+                }
+                else{
+                    Toast.makeText(getBaseContext(), "Check Internet connection", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        });
+
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                //check internet connection
+                if (Common.isConnectedInternet(getBaseContext()) == true){
+                    loadSuggestions();
+                    loodLFoodList(categoryId);
+                }
+                else{
+                    Toast.makeText(getBaseContext(), "Check Internet connection", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        });
+
 
         //recieving intent with category id
         if (getIntent() != null) {
@@ -134,15 +175,6 @@ public class FoodList extends AppCompatActivity {
             loodLFoodList(categoryId);
         }
 
-        //check internet connection
-        if (Common.isConnectedInternet(this) == true){
-            loadSuggestions();
-            loodLFoodList(categoryId);
-        }
-        else{
-            Toast.makeText(this, "Check Internet connection", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         //search
         materialSearchBar.setHint("search");
@@ -358,14 +390,9 @@ public class FoodList extends AppCompatActivity {
             }
 
         };
-        recycler_food.setAdapter(adapter);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         adapter.startListening();
-
+        recycler_food.setAdapter(adapter);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override

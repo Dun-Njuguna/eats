@@ -14,8 +14,8 @@ import com.dunk.eats.R;
 
 public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    public TextView txtMenuName;
-    public ImageView imageView;
+    public TextView txtMenuName, popularTitle;
+    public ImageView imageView,popularImage;
 
     private ItemClickListener itemClickListener;
 
@@ -28,7 +28,10 @@ public class MenuViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         super(itemView);
 
         txtMenuName = (TextView)itemView.findViewById(R.id.menu_name);
+        popularTitle = (TextView)itemView.findViewById(R.id.popularTitle);
         imageView = (ImageView)itemView.findViewById(R.id.menu_image);
+        popularImage = (ImageView)itemView.findViewById(R.id.popularImage);
+
 
         itemView.setOnClickListener(this);
     }

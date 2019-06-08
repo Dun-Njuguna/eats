@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,24 +24,35 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.dunk.eats.Common.Common;
 import com.dunk.eats.Interface.ItemClickListener;
-import com.dunk.eats.Service.MyFirebaseIdService;
 import com.dunk.eats.ViewHolder.MenuViewHolder;
+import com.dunk.eats.models.Banner;
 import com.dunk.eats.models.Category;
 import com.dunk.eats.models.Token;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
+import com.glide.slider.library.Animations.DescriptionAnimation;
+import com.glide.slider.library.SliderLayout;
+import com.glide.slider.library.SliderTypes.BaseSliderView;
+import com.glide.slider.library.SliderTypes.TextSliderView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,10 +66,19 @@ public class Home extends AppCompatActivity
     TextView txtFullName;
     @BindView(R.id.recycler_menue) RecyclerView recycler_menu;
     RecyclerView.LayoutManager layoutManager;
+    @BindView(R.id.recycler_popular) RecyclerView recycler_popular;
 
-    FirebaseRecyclerAdapter<Category,MenuViewHolder> adapter;
+
+    FirebaseRecyclerAdapter<Category,MenuViewHolder> adapter, adapter2;
 
     String currentUserPhone;
+
+    @BindView(R.id.swipe_layout) SwipeRefreshLayout swipeRefreshLayout;
+
+    //Slider
+    HashMap<String,String> image_list;
+    @BindView(R.id.slider) SliderLayout mSlider;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +86,51 @@ public class Home extends AppCompatActivity
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Menu");
+        toolbar.setTitle("");
+
 
         //firebase
         database = FirebaseDatabase.getInstance();
         category = database.getReference("Category");
 
+        //swipe refresh layout
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark
+                );
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //check internet connection then load menue
+                if (Common.isConnectedInternet(getBaseContext()) == true){
+                    loadmenue();
+                    loadPopular();
+                    setUpSlider();
+                    mSlider.startAutoCycle();
+                }
+                else{
+                    Toast.makeText(getBaseContext(), "Check Internet connection", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        });
+
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                //check internet connection then load menue
+                if (Common.isConnectedInternet(getBaseContext()) == true){
+                    loadmenue();
+                    loadPopular();
+                }
+                else{
+                    Toast.makeText(getBaseContext(), "Check Internet connection", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        });
 
         setSupportActionBar(toolbar);
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -93,21 +154,26 @@ public class Home extends AppCompatActivity
         txtFullName = (TextView)headerView.findViewById(R.id.txttfullname);
         txtFullName.setText(Common.currentUser.getName());
 
+        //loadpopular
+        recycler_popular.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false){
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
+        recycler_popular.setLayoutManager(layoutManager);
+
         //load menu
         recycler_menu.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recycler_menu.setLayoutManager(layoutManager);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2){
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
+        recycler_menu.setLayoutManager(gridLayoutManager);
 
-
-
-        //check internet connection then load menue
-        if (Common.isConnectedInternet(this) == true){
-            loadmenue();
-        }
-        else{
-            Toast.makeText(this, "Check Internet connection", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         //init paper
         Paper.init(this);
@@ -128,8 +194,76 @@ public class Home extends AppCompatActivity
                     }
                 });
 
+        //setup slider
+        setUpSlider();
 
     }
+
+    private void setUpSlider() {
+        image_list = new HashMap<>();
+        final DatabaseReference banners = database.getReference("Banner");
+        banners.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren())
+                {
+                    Banner banner = postSnapshot.getValue(Banner.class);
+                    image_list.put(banner.getName() + "_" + banner.getId(), banner.getImage());
+                }
+                for (String key:image_list.keySet())
+                {
+                   String[] keySplit = key.split("_");
+                   String nameOfFood = keySplit[0];
+                   String idOfFood = keySplit[1];
+
+                    RequestOptions requestOptions = new RequestOptions();
+                    requestOptions.centerCrop();
+
+                   //Create slider
+                    final TextSliderView textSliderView = new TextSliderView(getBaseContext());
+                    textSliderView
+                            .image(image_list.get(key))
+                            .description(nameOfFood)
+                            .setRequestOption(requestOptions)
+                            .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
+                                @Override
+                                public void onSliderClick(BaseSliderView slider) {
+                                    Intent intent = new Intent(Home.this, FoodDetail.class);
+                                    intent.putExtras(textSliderView.getBundle());
+                                    startActivity(intent);
+                                }
+                            });
+                    //Add extra bundle
+                    textSliderView.bundle(new Bundle());
+                    textSliderView.getBundle().putString("FoodId", idOfFood);
+                    mSlider.addSlider(textSliderView);
+
+                    //remove event after finish
+                    banners.removeEventListener(this);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        mSlider.setPresetTransformer(SliderLayout.Transformer.Background2Foreground);
+        mSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
+        mSlider.setCustomAnimation( new DescriptionAnimation());
+        mSlider.setDuration(4000);
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        loadmenue();
+        loadPopular();
+        mSlider.startAutoCycle();
+    }
+
     //add token during login
     private void updateToken(String instanceId) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
@@ -139,6 +273,55 @@ public class Home extends AppCompatActivity
         tokens.child(currentUserPhone).setValue(token1);
     }
 
+    private void loadPopular(){
+
+        Query query = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("PopularCategories");
+
+        FirebaseRecyclerOptions<Category> options =
+                new FirebaseRecyclerOptions.Builder<Category>()
+                        .setQuery(query, new SnapshotParser<Category>() {
+                            @NonNull
+                            @Override
+                            public Category parseSnapshot(@NonNull DataSnapshot snapshot) {
+                                return new Category(
+                                        snapshot.child("image").getValue().toString(),
+                                        snapshot.child("name").getValue().toString());
+
+                            }
+                        }).build();
+
+
+        adapter2 = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(options) {
+            @Override
+            public MenuViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.menu_popular_item, parent, false);
+
+                return new MenuViewHolder(view);
+            }
+
+
+            @Override
+            protected void onBindViewHolder(MenuViewHolder viewHolder, final int position, Category model) {
+                viewHolder.popularTitle.setText(model.getImage());
+                Picasso.get().load(model.getName()).into(viewHolder.popularImage);
+
+                viewHolder.setItemClickListener(new ItemClickListener(){
+                    @Override
+                    public void onclick(View view, int position, boolean isLongClick) {
+                        //get category id when user clicks and send to new activity
+                        Intent intent = new Intent(Home.this, FoodList.class);
+                        intent.putExtra("CategoryId", adapter.getRef(position).getKey());
+                        startActivity(intent);
+                    }
+                });
+            }
+        };
+        adapter2.startListening();
+        recycler_popular.setAdapter(adapter2);
+    }
 
     private void loadmenue(){
 
@@ -186,7 +369,9 @@ public class Home extends AppCompatActivity
                 });
             }
         };
+        adapter.startListening();
         recycler_menu.setAdapter(adapter);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 
@@ -212,9 +397,9 @@ public class Home extends AppCompatActivity
 
         if (item.getItemId() == R.id.refresh){
             if (Common.isConnectedInternet(this)){
-                adapter.onDetachedFromRecyclerView(recycler_menu);
-                adapter.startListening();
-                adapter.notifyDataSetChanged();
+                loadmenue();
+                loadPopular();
+                setUpSlider();
             }
             else
                 Toast.makeText(this, "Check internet connection", Toast.LENGTH_SHORT).show();
@@ -257,17 +442,13 @@ public class Home extends AppCompatActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        if (Common.isConnectedInternet(this))
-             adapter.startListening();
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         if (Common.isConnectedInternet(this))
-             adapter.stopListening();
+            adapter.stopListening();
+            adapter2.stopListening();
+            mSlider.stopAutoCycle();
     }
+
 
 }

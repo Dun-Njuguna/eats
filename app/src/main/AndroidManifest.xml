@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,9 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".all_restaurant_menu"></activity>
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_appId"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_appId" />
 
         <activity android:name=".OrderStatus" />
         <activity android:name=".Cart" />
@@ -35,19 +36,17 @@
             </intent-filter>
         </activity>
 
-
-        <service
-            android:name=".Service.MyFirebaseIdService">
+        <service android:name=".Service.MyFirebaseIdService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <provider android:authorities="com.facebook.app.FacebookContentProvider1291767770997453"
+        <provider
             android:name="com.facebook.FacebookContentProvider"
-            android:exported="true"/>
-
+            android:authorities="com.facebook.app.FacebookContentProvider1291767770997453"
+            android:exported="true" />
     </application>
 
 </manifest>
