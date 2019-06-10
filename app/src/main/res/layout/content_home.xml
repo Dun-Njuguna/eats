@@ -70,7 +70,7 @@
                             android:scrollbars="none"/>
 
                         <info.hoang8f.widget.FButton
-                            android:id="@+id/btnSignin"
+                            android:id="@+id/btnCategories"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="8dp"

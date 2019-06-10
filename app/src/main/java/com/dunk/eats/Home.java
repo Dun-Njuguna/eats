@@ -56,6 +56,7 @@ import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import info.hoang8f.widget.FButton;
 import io.paperdb.Paper;
 
 public class Home extends AppCompatActivity
@@ -64,6 +65,7 @@ public class Home extends AppCompatActivity
     FirebaseDatabase database;
     DatabaseReference category;
     TextView txtFullName;
+    @BindView(R.id.btnCategories) FButton btnCategories;
     @BindView(R.id.recycler_menue) RecyclerView recycler_menu;
     RecyclerView.LayoutManager layoutManager;
     @BindView(R.id.recycler_popular) RecyclerView recycler_popular;
@@ -129,6 +131,14 @@ public class Home extends AppCompatActivity
                     Toast.makeText(getBaseContext(), "Check Internet connection", Toast.LENGTH_SHORT).show();
                     return;
                 }
+            }
+        });
+
+        btnCategories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Home.this, all_categories.class);
+                startActivity(intent);
             }
         });
 
@@ -255,6 +265,7 @@ public class Home extends AppCompatActivity
         mSlider.setCustomAnimation( new DescriptionAnimation());
         mSlider.setDuration(4000);
     }
+
 
     @Override
     protected void onPostResume() {
